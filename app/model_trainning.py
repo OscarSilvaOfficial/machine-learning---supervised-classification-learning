@@ -1,5 +1,3 @@
-import firebase_admin
-from firebase_admin import credentials, firestore
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -7,25 +5,6 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, classification_report
 import ast
 import joblib
-
-cred = credentials.Certificate('./serviceAccountKey.json')
-firebase_admin.initialize_app(cred)
-
-db = firestore.client()
-
-def get_firestore_data(collection_name):
-    collection_ref = db.collection(collection_name)
-    docs = collection_ref.stream()
-    data = []
-    for doc in docs:
-        data.append(doc.to_dict())
-    print('Data retrieved')
-    return data
-
-def extract_data_for_csv(data):
-    df = pd.DataFrame(data)
-    df.to_csv('./data.csv', index=False)
-    print('Data saved on CSV')
 
 def drop_unused_columns(df: pd.DataFrame):
     columns = 'courseItemsNumber,id,numberOfArticles,readingTime,updatedAt,numberOfTopics,createdAt,version'
@@ -41,12 +20,6 @@ def save_model(clf: RandomForestClassifier):
     print("Model saved")
 
 # ---------------- Execution ------------------- #
-
-### Use to update CSV
-
-# extract_data_for_csv(
-#   data=get_firestore_data('courses_platform')
-# )
 
 df = pd.read_csv('./data.csv')
 drop_unused_columns(df)
